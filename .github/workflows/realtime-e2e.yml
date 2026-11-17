@@ -1,0 +1,28 @@
+name: Realtime E2E
+
+on:
+  workflow_dispatch:
+    inputs:
+      password:
+        description: Password of the throwaway E2E test users
+        required: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    env:
+      POOL_ID: ${{ secrets.AWS_COGNITO_USER_POOL_ID }}
+      POOL_CLIENT_ID: ${{ secrets.AWS_COGNITO_USER_POOL_CLIENT_ID }}
+      APPSYNC_ENDPOINT: ${{ secrets.AWS_APPSYNC_ENDPOINT }}
+      E2E_PASSWORD: ${{ inputs.password }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test deps
+        run: pip install boto3 websockets pycognito
+      - name: Run realtime check
+        run: |
+          echo "::add-mask::$E2E_PASSWORD"
+          python e2e/realtime_e2e.py
