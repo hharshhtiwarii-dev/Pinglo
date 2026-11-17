@@ -1,10 +1,10 @@
 # Pinglo
 
-A WhatsApp-like chat app for Android and the web. Built with React, Vite, TypeScript, Capacitor, and AWS.
+Pinglo is a chat app that works a lot like WhatsApp. It runs on Android and on the web, and it is open source.
 
-Send 1-to-1 and group messages, make voice and video calls, post status updates, lock private chats, and change the look of every chat — all in one app.
+You can send messages one to one or in groups, make voice and video calls, post status updates, lock chats you want to keep private, and change how every chat looks.
 
-> **Status:** Pinglo is under active development. The app works, but some features still need a real backend or a real phone to fully verify. The "What is still in progress" section below is honest about that.
+It is still being built. The app works, but a few things still need a real backend or a second phone to test properly. The "Not finished yet" section below says plainly what is missing, so you know where things stand.
 
 ---
 
@@ -22,81 +22,81 @@ Send 1-to-1 and group messages, make voice and video calls, post status updates,
 
 ---
 
-## Features
+## What it can do
 
-### Chat and messaging
+### Messaging
 
-- 1-to-1 chats and group chats
-- Real-time messages with live sync
+- One to one chats and group chats
+- Messages arrive in real time, with live sync
 - Typing indicators and read receipts (ticks)
-- Reply, edit, delete, pin, and star messages
-- Emoji reactions — tap or long-press a message
-- Polls (up to 6 options) with live vote counts
+- Reply to, edit, delete, pin, and star messages
+- Emoji reactions: tap or long-press a message
+- Polls with up to 6 options and live vote counts
 - Scheduled messages
-- View Once media — photos and videos that disappear after one view
+- View Once media: photos and videos that disappear after one view
 - Search inside a chat
-- Offline queue — messages you send without internet are sent later, automatically
+- Offline queue: messages you send without internet go out on their own once you are back online
 
-### Media and voice
+### Media and voice notes
 
-- Send photos, videos, documents, and voice notes (real microphone recording)
-- Voice notes with slide-to-cancel and lock-to-record
+- Send photos, videos, documents, and voice notes (recorded with the real microphone)
+- Voice notes with slide to cancel and lock to record
 - Share media from other apps into Pinglo
 - Camera, gallery, and file picker
-- Emoji picker, stickers, and GIFs (GIFs need a free Giphy key — see `.env.example`)
+- Emoji picker, stickers, and GIFs (GIFs need a free Giphy key, see `.env.example`)
 
 ### Voice and video calls
 
-- 1-to-1 voice and video calls (peer-to-peer WebRTC)
-- Call history (incoming, outgoing, missed)
+- One to one voice and video calls over WebRTC, peer to peer
+- Call history: incoming, outgoing, and missed
 - Shareable call links
-- Mute, speaker, video on/off, and end-call controls
+- Mute, speaker, video on and off, and end call controls
 
-### Status (stories)
+### Status
 
 - Post photo, video, and text status updates
 - Status privacy: everyone, contacts, close friends, or only you
-- Story viewer with progress bars and tap to move forward or back
+- A story viewer with progress bars, tap to move forward or back
 
 ### Privacy and locks
 
-- **End-to-end encryption** for 1-to-1 text messages: per-chat AES-256-GCM keys, exchanged with ECDH. Group text is also encrypted, with per-sender keys. Media files, polls, location messages, stickers, and message metadata are **not** encrypted yet.
-- **Locked chats** — hide a chat behind a PIN or fingerprint. Locked chats are hidden from the chat list, search, notifications, and gallery. Open them with a secret code typed in the search bar.
-- **App lock** — lock the whole app with a PIN or fingerprint when you leave it.
-- **Secret vault** — a separate PIN-protected space.
+- **End-to-end encryption for one to one text messages.** Each chat gets its own AES-256-GCM key, exchanged with ECDH. Group text is also encrypted, with per-sender keys. Media files, polls, location messages, stickers, and message metadata are **not** encrypted yet.
+- **Locked chats.** Hide a chat behind a PIN or fingerprint. Locked chats stay out of the chat list, search, notifications, and gallery. You open them by typing a secret code in the search bar.
+- **App lock.** Lock the whole app with a PIN or fingerprint when you step away.
+- **Secret vault.** A separate PIN-protected space.
 - Block and unblock contacts.
 
-### Themes and customisation
+### Themes
 
-- 15 preset chat themes, plus a free custom theme (pick your own colours)
+- 15 preset chat themes, plus a free custom theme where you pick your own colours
 - Chat wallpaper with a brightness slider
 - Light, dark, and system app themes
-- Per-chat wallpaper and theme
-- WhatsApp-style chat look (deep green headers, green sent bubbles, blue ticks)
+- A different wallpaper and theme per chat
+- A WhatsApp-style look: deep green headers, green sent bubbles, blue ticks
 
 ### Saved messages and more
 
-- **Saved Messages** — your own private space at the top of the chat list, for every message type
-- Broadcast lists — send one message to many people at once
+- **Saved Messages.** Your own private space at the top of the chat list, for every message type.
+- Broadcast lists: send one message to many people at once
 - Communities and channels
-- Chat backup and restore (on your device)
-- **Dev AI** — a built-in AI assistant (Google Gemini) that answers questions and can generate images. It needs a free Gemini API key. It is optional: the app works without it.
+- Chat backup and restore, on your device
+- **Dev AI.** A built-in AI assistant (Google Gemini) that answers questions and can generate images. It needs a free Gemini API key. It is optional, the app works fine without it.
 
 ---
 
-## What is still in progress
+## Not finished yet
 
 Please do not expect everything below to work yet:
 
-- **Backend enforcement is not done.** Encryption, locked chats, and privacy rules are enforced in the app on your phone, not on the server. A server-side check is still needed before this app is safe for real users.
+- **The backend does not enforce the rules yet.** Encryption, locked chats, and privacy rules are enforced in the app on your phone, not on the server. A server-side check still needs to be added before this app is safe for real users.
 - **Group calls** are planned, not finished.
 - **Push notifications when the app is closed** are not finished.
 - **Two-phone testing is still needed** for calls, message delivery ticks, and encryption between two real devices.
-- **Payments are not included**, and are not planned.
+- **Payments are not included**, and they are not planned.
 
 ---
 
-## Tech stack
+## How it is built
 
 | Part | Technology |
 | --- | --- |
@@ -112,7 +112,7 @@ Please do not expect everything below to work yet:
 
 ---
 
-## Install and run
+## Run it yourself
 
 ### What you need
 
@@ -135,7 +135,7 @@ npm run dev
 
 Then open <http://localhost:3000> in your browser.
 
-Without AWS values in `.env`, the app runs in **local mode**: it works for trying the UI, but messages and accounts stay on your device and are not shared with other people. See [docs/SETUP.md](docs/SETUP.md) to connect real AWS services.
+Without AWS values in `.env`, the app runs in **local mode**. It works for trying the UI, but messages and accounts stay on your device and are not shared with anyone else. See [docs/SETUP.md](docs/SETUP.md) to connect real AWS services.
 
 ### Build the web app
 
@@ -165,9 +165,9 @@ npm test            # run tests (Vitest)
 
 ---
 
-## Configure
+## Settings
 
-All settings live in one file: `.env` in the project root. Never commit your real `.env` to git — it holds your private keys.
+All settings live in one file: `.env` in the project root. Never commit your real `.env` to git, it holds your private keys.
 
 1. Copy the template:
    ```bash
@@ -189,11 +189,11 @@ The app reads these settings at build time:
 | `VITE_AWS_APPSYNC_ENDPOINT` | AppSync GraphQL endpoint URL |
 | `VITE_AWS_APPSYNC_API_KEY` | AppSync API key |
 | `VITE_GEMINI_API_KEY` | Google Gemini API key (for Dev AI, optional) |
-| `GEMINI_API_KEY` | Same as above — fallback key, read if `VITE_GEMINI_API_KEY` is empty |
+| `GEMINI_API_KEY` | Same as above, a fallback key, read if `VITE_GEMINI_API_KEY` is empty |
 
 ---
 
-## Project structure
+## Project layout
 
 ```
 src/
@@ -232,7 +232,7 @@ Contributions are welcome. Please keep it simple:
 2. Make one small change per pull request.
 3. Run `npm run lint` and `npm test` before you open the pull request.
 4. Do not commit `.env`, API keys, or any real credentials. Use placeholders only.
-5. Do not add payment features — they are out of scope for this app.
+5. Do not add payment features, they are out of scope for this app.
 
 If you find a security problem, please do not open a public issue. Contact the owner privately instead.
 
@@ -240,10 +240,10 @@ If you find a security problem, please do not open a public issue. Contact the o
 
 ## Credits
 
-- **Created and owned by hharshhtiwarii-dev.**
+Created and owned by hharshhtiwarii-dev.
 
 ---
 
 ## License
 
-**Suggested license: MIT.** This has not been confirmed yet — the owner still needs to choose and confirm the final license before the public release. Until then, do not treat the code as MIT-licensed.
+**Suggested license: MIT.** This has not been confirmed yet. The owner still needs to choose and confirm the final license. Until then, do not treat the code as MIT-licensed. There is no LICENSE file in the repo yet.
