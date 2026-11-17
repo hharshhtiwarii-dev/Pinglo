@@ -10,15 +10,41 @@ It is still being built. The app works, but a few things still need a real backe
 
 ## Screenshots
 
-| Chat list | Conversation | Calls |
+| Chat list | Conversation | Group chat |
 | --- | --- | --- |
-| ![Chat list](docs/screenshots/chat-list.png) | ![Chat conversation](docs/screenshots/chat-conversation.png) | ![Calls](docs/screenshots/calls.png) |
+| ![Chat list](docs/screenshots/chat-list.png) | ![Conversation](docs/screenshots/chat-conversation.png) | ![Group chat](docs/screenshots/group-chat.png) |
 
-| Status | Settings | Theme picker |
+| New chat | Search | Archived chats |
 | --- | --- | --- |
-| ![Status](docs/screenshots/status.png) | ![Settings](docs/screenshots/settings.png) | ![Theme picker](docs/screenshots/theme-picker.png) |
+| ![New chat](docs/screenshots/new-chat.png) | ![Search](docs/screenshots/search.png) | ![Archived chats](docs/screenshots/archived-chats.png) |
 
-![Profile](docs/screenshots/profile.png)
+| Starred messages | Group info | Locked chats |
+| --- | --- | --- |
+| ![Starred messages](docs/screenshots/starred-messages.png) | ![Group info](docs/screenshots/chat-info.png) | ![Locked chats](docs/screenshots/locked-chats.png) |
+
+| Calls | Voice call | Video call |
+| --- | --- | --- |
+| ![Calls](docs/screenshots/calls.png) | ![Voice call](docs/screenshots/voice-call.png) | ![Video call](docs/screenshots/video-call.png) |
+
+| Voice note | Media viewer | Emoji picker |
+| --- | --- | --- |
+| ![Voice note](docs/screenshots/voice-note.png) | ![Media viewer](docs/screenshots/media-viewer.png) | ![Emoji picker](docs/screenshots/emoji-picker.png) |
+
+| Status | Status viewer | Status editor |
+| --- | --- | --- |
+| ![Status](docs/screenshots/status.png) | ![Status viewer](docs/screenshots/status-viewer.png) | ![Status editor](docs/screenshots/status-editor.png) |
+
+| Settings | Account settings | Privacy settings |
+| --- | --- | --- |
+| ![Settings](docs/screenshots/settings.png) | ![Account settings](docs/screenshots/account-settings.png) | ![Privacy settings](docs/screenshots/privacy-settings.png) |
+
+| Notifications settings | Theme picker | Profile |
+| --- | --- | --- |
+| ![Notifications settings](docs/screenshots/notifications-settings.png) | ![Theme picker](docs/screenshots/theme-picker.png) | ![Profile](docs/screenshots/profile.png) |
+
+| Dev AI chat |
+| --- |
+| ![Dev AI chat](docs/screenshots/dev-ai-chat.png) |
 
 ---
 
