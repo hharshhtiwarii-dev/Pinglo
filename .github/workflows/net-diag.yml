@@ -1,0 +1,22 @@
+name: Network diagnostics
+
+on:
+  workflow_dispatch:
+
+jobs:
+  turn-probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe our TURN server with a STUN binding request
+        run: |
+          python3 - <<'PY'
+          import socket, struct, os
+          req = struct.pack('!HHI', 0x0001, 0, 0x2112A442) + os.urandom(12)
+          s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.settimeout(8)
+          try:
+              s.sendto(req, ("${{ secrets.TURN_SERVER_IP }}", 3478))
+              data, _ = s.recvfrom(1024)
+              print("TURNPROBE reply bytes=%d type=0x%04x" % (len(data), struct.unpack('!H', data[:2])[0]))
+          except Exception as e:
+              print("TURNPROBE no reply:", e)
+          PY
