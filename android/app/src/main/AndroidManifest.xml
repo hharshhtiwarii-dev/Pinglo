@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBarLaunch"
+            android:launchMode="singleTask"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- AUDIT-2 B17: deep links. The app's own link formats
+                 (see services/deepLink.ts + components/groupAdmin.ts):
+                   https://pinglo.app/chat/<id>?type=community&inv=<token>  (invite)
+                   https://pinglo.app/call/<uid>?t=<token>                  (call link)
+                   https://pinglo.app/user/<uid> | /group/<id>              (profile/group)
+                   pinglo://<anything>                                       (in-app scheme)
+                 The https filter uses autoVerify (App Link): Android only
+                 routes https links straight to the app once pinglo.app
+                 hosts .well-known/assetlinks.json — that server file is a
+                 BACKEND follow-up (see BACKEND-PLAN.md), NOT faked here.
+                 Until it exists, https links open in the browser; the
+                 pinglo:// filter works as soon as the app is installed. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="pinglo.app" android:pathPrefix="/chat" />
+                <data android:scheme="https" android:host="pinglo.app" android:pathPrefix="/call" />
+                <data android:scheme="https" android:host="pinglo.app" android:pathPrefix="/user" />
+                <data android:scheme="https" android:host="pinglo.app" android:pathPrefix="/group" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="pinglo" />
+            </intent-filter>
+
+            <!-- ROADMAP-2 #8: share-sheet target. Gallery / browser
+                 "Share → Pinglo" previously did nothing: the manifest
+                 only declared MAIN, so the OS never offered the app as a
+                 share target. These filters make Android offer Pinglo
+                 for shared text, single images/video and multiple
+                 images/video. The intent itself is received by
+                 ShareIntentPlugin.java (registered in MainActivity): it
+                 copies shared streams into the app cache dir and exposes
+                 them to the web side via the 'ShareIntent' Capacitor
+                 plugin (services/shareIntent.ts). launchMode is already
+                 singleTask, so a share sent while the app is open arrives
+                 via onNewIntent instead of relaunching the app.
+                 NOTE: the native intent path can only be proven by a CI
+                 APK build + a real device (no javac/Android SDK in this
+                 sandbox) — see roadmap2/PATCH-R1B.md. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+
+        </activity>
+
+        <!-- AUDIT-2 B18: foreground service that keeps call audio alive
+             when the app is backgrounded mid-call. The
+             FOREGROUND_SERVICE_MICROPHONE permission was already declared
+             but NO service existed, so background call audio could cut.
+             Started by the CallForeground Capacitor plugin when a call
+             becomes active (outgoing dial / accepted incoming) and stopped
+             in callService.endCall(). Implementation:
+             CallForegroundService.java (notification + startForeground
+             with FOREGROUND_SERVICE_TYPE_MICROPHONE). -->
+        <service
+            android:name=".CallForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
+    </application>
+
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <!-- Phase 3: notifications + foreground call service. Bluetooth
+         audio routing itself lives in AudioRoutePlugin.java (Report 3
+         #9–#19): BLUETOOTH_CONNECT is requested at runtime by that
+         plugin before/during call setup — the manifest declaration
+         alone does NOT grant it on API 31+. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <!-- Legacy Bluetooth permission for the pre-31 SCO path in
+         AudioRoutePlugin (API 31+ uses BLUETOOTH_CONNECT instead). -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+</manifest>

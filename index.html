@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#121B22" />
+    <meta name="description" content="Pinglo — Dev Bhai ka App" />
+
+    <!-- Prevent zoom on input focus (mobile) -->
+    <style>
+      input, textarea, select { font-size: 16px !important; }
+      * { -webkit-tap-highlight-color: transparent; }
+      body { overscroll-behavior: none; }
+    </style>
+
+    <title>Pinglo</title>
+  </head>
+  <body>
+    <div id="root">
+      <!-- REPORT-3 #132 (W13 NEXT R3): static splash — first paint used to
+           wait for the whole entry JS bundle to parse + execute before
+           React could render anything (~400–1,200ms). This inline-styled
+           splash paints the moment the HTML arrives; React replaces it on
+           first render (and the React Splash takes over if auth is still
+           resolving), so the swap is invisible. Pure inline styles: it
+           must not wait on the Tailwind stylesheet either. -->
+      <div style="display:flex;height:100vh;height:100dvh;flex-direction:column;align-items:center;justify-content:center;background:#0B141A;gap:16px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;">
+        <div style="width:80px;height:80px;border-radius:9999px;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 25px 50px -12px rgba(20,83,45,.5);">
+          <svg viewBox="0 0 24 24" fill="white" style="width:40px;height:40px;"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+        </div>
+        <div style="text-align:center;">
+          <h1 style="font-size:30px;font-weight:700;color:#fff;letter-spacing:-0.025em;margin:0;">Pinglo</h1>
+          <p style="font-size:14px;color:#9ca3af;margin:4px 0 0;">Dev Bhai ka App 😎</p>
+        </div>
+        <div style="width:160px;height:2px;background:#1f2937;border-radius:9999px;overflow:hidden;margin-top:16px;">
+          <div style="height:100%;background:#25D366;border-radius:9999px;animation:pinglo-splash-loading 2s ease forwards;"></div>
+        </div>
+        <style>@keyframes pinglo-splash-loading{from{width:0%}to{width:100%}}</style>
+      </div>
+    </div>
+    <script>
+      // REPORT-3 #248 (W13 NEXT R4) boot watchdog: if the entry chunk fails
+      // to load (flaky network, bad deploy), React never mounts and no
+      // ErrorBoundary exists — the page would sit blank forever (the D10 /
+      // D1y shapes in the REPORT-3 forensics: empty #root, zero console
+      // output). After 15s with no mount, show an honest reload prompt;
+      // it removes itself if React mounts late. Pure inline JS: it must
+      // not wait on any chunk.
+      (function () {
+        var shown = false;
+        function show() {
+          if (shown || window.__PINGLO_MOUNTED__) return;
+          shown = true;
+          var d = document.createElement('div');
+          d.id = 'dt-boot-watchdog';
+          d.setAttribute('style', 'position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#0B141A;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;text-align:center;padding:24px;');
+          d.innerHTML = '<div style="font-size:20px;font-weight:700;">Pinglo couldn\'t load</div><div style="font-size:14px;color:#9ca3af;max-width:320px;">Your connection dropped a file while loading. Check your connection and try again.</div><button onclick="window.location.reload()" style="padding:10px 20px;border:0;border-radius:9999px;background:#25D366;color:#fff;font-size:14px;font-weight:700;cursor:pointer;">Reload app</button>';
+          document.body.appendChild(d);
+        }
+        setTimeout(show, 15000);
+        var iv = setInterval(function () {
+          if (window.__PINGLO_MOUNTED__) { clearInterval(iv); var el = document.getElementById('dt-boot-watchdog'); if (el) el.remove(); }
+        }, 1000);
+      })();
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

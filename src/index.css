@@ -1,0 +1,304 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary-green: #25D366;
+  /* CTA green for white text/icons on a green surface. White on
+     #25D366 is 1.98:1 (unreadable); white on #008069 is 4.89:1.
+     Use bg-green-cta (not bg-primary-green) wherever white text or
+     icons sit on green. #25D366 stays the token for green TEXT on
+     dark surfaces (9.06:1 on #161717) and for decorative fills — do
+     NOT reassign --color-primary-green itself, or dark-mode green
+     text goes muddy (3.86:1) and dark-text buttons (text-on-primary-
+     green, 7.73:1 on #25D366) drop to 3.14:1. */
+  --color-green-cta: #008069;
+  /* Dark text/icon colour for use ON the bright primary green
+     (#25D366). White on #25D366 is ~2:1 (Ponytail audit #22 — the
+     button colour itself is a product decision, so the fix is the
+     foreground, not the background). #062b1a on #25D366 is ~7:1. */
+  --color-on-primary-green: #062b1a;
+  --color-dark-green: #128C7E;
+  --color-header-green: #075E54;
+  --color-header-green-light: #008069;
+  --color-bg-dark: #161717;
+  --color-panel-dark: #1D1F1F;
+  --color-input-dark: #242626;
+  --color-sent-bubble: #144D37;
+  --color-recv-bubble: #242626;
+  --color-text-primary: #FAFAFA;
+  /* Secondary text follows WhatsApp's alpha model (WDS): light
+     rgba(0,0,0,.6), dark rgba(255,255,255,.6) — see the unlayered
+     .dark override below (must stay unlayered: @theme emits :root
+     unlayered, so a @layer base override would lose). */
+  --color-text-secondary: rgba(0, 0, 0, 0.6);
+  --color-danger-red: #EF5350;
+  --color-seen-blue: #53BDEB;
+
+  --color-bg-light: #F0F2F5;
+  --color-panel-light: #FFFFFF;
+  --color-sent-bubble-light: #D9FDD3;
+  --color-recv-bubble-light: #FFFFFF;
+  --color-wallpaper-light: #F5F1EB;
+  --color-chat-bg: #161717;
+  --color-chat-bg-light: #F5F1EB;
+  --color-bubble-text: #FAFAFA;
+  --color-bubble-text-light: #0A0A0A;
+}
+
+/* WhatsApp parity (fix 9, dark half): secondary text is
+   rgba(255,255,255,.6) in dark mode. This MUST stay outside
+   @layer base — @theme emits :root unlayered, and unlayered rules
+   beat layered ones, so a .dark override inside @layer base would
+   lose to the @theme value. */
+.dark {
+  --color-text-secondary: rgba(255, 255, 255, 0.6);
+}
+
+/* WA audit (d) S6/S9: status-ring colours from the WhatsApp WDS tokens.
+   Unviewed = #25D366 (in StatusRing), viewed/seen = #C2BDB8 light /
+   #757778 dark, Close Friends unviewed = #C15ADD (in StatusRing).
+   Same unlayered-.dark pattern as --color-text-secondary above: @theme
+   emits :root unlayered, so the dark override must also be unlayered. */
+:root {
+  --wa-status-seen: #C2BDB8;
+}
+.dark {
+  --wa-status-seen: #757778;
+}
+
+/* WA72 settings #47 (was PARTIAL): message-body font size follows the
+   Font size setting. applyFontSize() in appSettings.ts sets
+   html[data-dt-font-size] + the root font-size; rem utilities scale with
+   the root, but chat message text was fixed text-[15px] so it NEVER
+   changed. --dt-msg-font-size mirrors FONT_PX in appSettings.ts
+   (14 / 16 / 18) and .dt-msg-text is used on message bodies, captions,
+   the composer input and Saved Messages text instead of text-[15px].
+   Unlayered like the .dark overrides above, so it beats layered utils. */
+html[data-dt-font-size='small'] {
+  --dt-msg-font-size: 14px;
+}
+html[data-dt-font-size='medium'] {
+  --dt-msg-font-size: 16px;
+}
+html[data-dt-font-size='large'] {
+  --dt-msg-font-size: 18px;
+}
+.dt-msg-text {
+  font-size: var(--dt-msg-font-size, 16px);
+}
+
+@layer base {
+  body {
+    @apply bg-bg-light text-gray-900 dark:bg-bg-dark dark:text-text-primary antialiased;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Remove default button styles */
+  button {
+    touch-action: manipulation;
+    cursor: pointer;
+  }
+
+  /* Hallmark floor rule 6 / Impeccable states: keyboard focus must
+     always be visible, and appear instantly (no transition on the
+     outline). The voice-status recorder moves focus programmatically
+     (StatusScreen), so without this the moved focus would be invisible.
+     One colour per mode, both from existing tokens — a single green
+     fails: #25D366 on white is 1.98:1 (measured). Light: #075E54 on
+     white 7.67:1; dark: #25D366 on #1D1F1F 8.35:1. The 2px offset puts
+     the ring on the surrounding surface, not the button itself. */
+  :focus-visible {
+    outline: 2px solid var(--color-header-green);
+    outline-offset: 2px;
+  }
+  .dark :focus-visible {
+    outline-color: var(--color-primary-green);
+  }
+
+  /* Hallmark floor rule 7: honour reduced motion — the recording dot's
+     pulse, toasts and message animations go still instead of animating. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Scrollbar hide utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Thin scrollbar for chat */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 3px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+  }
+
+  :root {
+    --sat: 0px;
+    --sab: env(safe-area-inset-bottom, 0px);
+    /* Chat bubble colours, resolved per colour scheme. Theme presets in
+       SettingsScreen override the --color-* vars below on
+       documentElement; these vars are what the bubble utilities read, so
+       a preset actually changes the bubbles. (Previously applyTheme set
+       --sent-bubble/--recv-bubble, which no utility ever read.) */
+    --chat-sent-bubble: var(--color-sent-bubble-light);
+    --chat-recv-bubble: var(--color-recv-bubble-light);
+    --chat-bg-resolved: var(--color-chat-bg-light);
+    --chat-header: #075E54;
+    /* Seen-tick blue (light mode): WhatsApp's exact #007BFC on the
+       light sent bubble #D9FDD3 is 3.62:1 (measured, passes
+       non-text 3:1). Delivered ticks follow WhatsApp's alpha model:
+       rgba(0,0,0,.6) blended on #D9FDD3 is 5.58:1. Dark mode keeps
+       the brighter values (see .dark below). */
+    --chat-tick: #007BFC;
+    --chat-tick-grey: rgba(0, 0, 0, 0.6);
+    --chat-text-sent: var(--color-bubble-text-light);
+    --chat-text-recv: var(--color-bubble-text-light);
+  }
+
+  .dark {
+    --chat-sent-bubble: var(--color-sent-bubble);
+    --chat-recv-bubble: var(--color-recv-bubble);
+    --chat-bg-resolved: var(--color-chat-bg);
+    /* Dark-mode ticks: #53BDEB on the dark sent bubble #144D37 is
+       4.59:1; delivered grey rgba(255,255,255,.6) blended on
+       #144D37 is 4.65:1. Both pass non-text 3:1. */
+    --chat-tick: #53BDEB;
+    --chat-tick-grey: rgba(255, 255, 255, 0.6);
+    --chat-text-sent: var(--color-bubble-text);
+    --chat-text-recv: var(--color-bubble-text);
+  }
+
+  /* ChatScreen hardcodes bg-[#005C4B] for sent bubbles (that file is owned
+     by another agent in Phase 3). Route that class through the theme var so
+     presets take effect there too, instead of leaving it permanently green.
+     SavedMessagesScreen was switched to the bg-sent-bubble utilities, so
+     this override only affects ChatScreen. */
+  .bg-\[\#005C4B\] {
+    background-color: var(--chat-sent-bubble) !important;
+  }
+
+  /* Theme fix: the Classic Pro header green (#075E54) is routed through
+     --chat-header so a custom theme's header colour applies app-wide
+     (chat headers, settings headers, vault, communities, locked folder). */
+  .bg-\[\#075E54\] {
+    background-color: var(--chat-header) !important;
+  }
+
+  .capacitor-native {
+    --sat: 0px;
+  }
+
+  /* Safe area padding matching native Android status bar */
+  .pt-safe {
+    padding-top: var(--sat, 0px);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+@layer utilities {
+  /* Highlight animation for scrolling to reply message */
+  @keyframes reply-flash {
+    0%, 100% { background-color: transparent; }
+    50% { background-color: rgba(37, 211, 102, 0.25); }
+  }
+  .animate-reply-flash {
+    animation: reply-flash 1.5s ease-in-out;
+  }
+  /* Typing bounce animation */
+  @keyframes bounce-dot {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+  .animate-bounce-dot {
+    animation: bounce-dot 1.2s ease-in-out infinite;
+  }
+
+  /* Fade in for toasts */
+  /* Full-screen overlays (calls, modals) must never be shifted sideways.
+     The old keyframe used translateX(-50%) + forwards, which pushed whole
+     screens half outside the phone. */
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-in {
+    animation: fade-in 0.2s ease both;
+  }
+
+  /* Only for toasts that are centred with left-1/2 -translate-x-1/2 */
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(-8px) translateX(-50%); }
+    to { opacity: 1; transform: translateY(0) translateX(-50%); }
+  }
+  .animate-toast {
+    animation: toast-in 0.2s ease both;
+  }
+
+  /* Status progress bar */
+  @keyframes status-progress {
+    from { width: 0%; }
+    to { width: 100%; }
+  }
+
+  /* Pulse glow for recording */
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 83, 80, 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(239, 83, 80, 0); }
+  }
+  .animate-pulse-glow {
+    animation: pulse-glow 1.5s ease-in-out infinite;
+  }
+
+  /* Slide up for modals */
+  @keyframes slide-up {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .animate-slide-up {
+    animation: slide-up 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  /* #31: message entry animation — new bubbles pop in (~150ms scale/fade),
+     like WhatsApp. Applied only to the newest bubble (ChatScreen). */
+  @keyframes msg-in {
+    from { opacity: 0; transform: scale(0.96) translateY(4px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .animate-msg-in {
+    animation: msg-in 0.15s ease-out both;
+  }
+
+  /* Loading bar for splash */
+  @keyframes loading {
+    from { width: 0%; }
+    to { width: 100%; }
+  }
+
+  /* Seen blue tick */
+  .text-seen-blue {
+    color: #53BDEB;
+  }
+}

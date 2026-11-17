@@ -1,0 +1,70 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace "com.devbhai.pinglo"
+    compileSdk rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.devbhai.pinglo"
+        // AUDIT-2 D2 (2026-11-14): minSdk 22 (Android 5.1) stays FOR NOW.
+        // A stock API-22 WebView is ~Chromium 39, but Tailwind v4 needs
+        // Chrome 111+ (oklch/color-mix) and Chrome 99+ (@layer) — see
+        // src/services/webViewGuard.ts + PATCH-3C.md for the measured
+        // evidence. No build-time CSS fix can close that gap (Lightning
+        // CSS leaves @layer/:where/color-mix(var()) untouched), so the
+        // app now warns old-WebView users to update Android System
+        // WebView instead of rendering broken. Raising minSdk to 26+
+        // (Android 8, whose WebViews the Play Store keeps current) is
+        // the real fix but drops Android 5-7 users — USER DECISION
+        // needed; do NOT bump this without it. versionCode: Batch 1.
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        // AUDIT-2 D1: versionCode was stuck at 1 since the first build.
+        // Bumped to 2 for this release. NOTE: CI does NOT auto-bump
+        // versionCode yet — bump it by hand on every release build, or
+        // Google Play will reject the upload as a duplicate version.
+        versionCode 2
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.biometric:biometric:1.1.0"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}
