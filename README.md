@@ -241,7 +241,6 @@ If you find a security problem, please do not open a public issue. Contact the o
 ## Credits
 
 - **Created and owned by hharshhtiwarii-dev.**
-- Built with the help of **Claude Code** and **FreeLLMAPI** — AI coding tools used during development.
 
 ---
 
